@@ -136,7 +136,10 @@ exit:
 
 
 
-Subtraction:   
+Subtraction:mov ah,09h
+            mov dx, offset msg2
+            int 21h
+            mov cx,0   
 
 
 
