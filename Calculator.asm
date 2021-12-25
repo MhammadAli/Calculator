@@ -128,8 +128,6 @@ View:  mov ax,dx
 exit:   
         mov ah, 09h
         int 21h  
-
-
         mov ah, 0
         int 16h
 
@@ -137,7 +135,7 @@ exit:
 
 
 Subtraction:mov ah,09h
-            mov dx, offset msg2
+            mov dx, offset firstNumberMsg
             int 21h
             mov cx,0   
 
