@@ -12,7 +12,8 @@ operationMsg: db 0dh,0ah, "Choose your operation 1- Addition 2- Subtraction 3- M
 firstNumberMsg: db 0dh,0ah, "Enter the first number: ", "$"
 secondNumberMsg: db 0dh,0ah, "Enter the second number: ", "$"
 errorMsg: db 0dh,0ah, "Not valid number, press any key to restart $"   ; if we removed the dollar sign ($) it will print the next message. it makes the console stops instead of it
-resultMsg: db 0dh,0ah, "The result is: $"        
+resultMsg: db 0dh,0ah, "The result is: $"
+SubNegativeMessage: db      0dh,0ah,"Result : - $"
 
 
 
@@ -138,7 +139,36 @@ exit:
 Subtraction:mov ah,09h
             mov dx, offset firstNumberMsg
             int 21h
-            mov cx,0   
+            mov cx,0
+            call InputNumber
+            push dx
+            mov ah,9
+            mov dx, offset secondNumberMsg
+            int 21h 
+            mov cx,0
+            call InputNumber
+            pop bx
+            mov ax,dx
+            cmp bx,ax
+            jl  Liss
+            sub bx,ax
+            mov dx,bx
+            push dx
+            mov ah,9
+            mov dx, offset resultMsg
+            jmp complet
+              
+Liss:       sub ax,bx
+            mov dx,ax
+            push dx
+            mov ah,9
+            mov dx, offset SubNegativeMessage
+
+complet:    int 21h
+            mov cx,10000
+            pop dx
+            call View 
+            jmp exit   
 
 
 
