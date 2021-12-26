@@ -130,6 +130,7 @@ exit:
         int 21h  
         mov ah, 0
         int 16h
+        call start  ;return to menu to select a new operation
 
 
 
