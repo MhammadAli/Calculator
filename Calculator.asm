@@ -8,12 +8,14 @@ jmp start                                              ;0ah is equal to \n for n
                                                        ;0dh is carriage return            = 13 in decimal
                               
 
-operationMsg: db 0dh,0ah, "Choose your operation 1- Addition 2- Subtraction 3- Multiplication 4- Division" ,0dh,0ah,"$"
+
+operationMsg: db 0dh,0ah, "Choose your operation" ,0dh,0ah,"1- Addition" ,0dh,0ah,"2- Subtraction" ,0dh,0ah,"3- Multiplication" ,0dh,0ah,"4- Division" ,0dh,0ah,"$"
 firstNumberMsg: db 0dh,0ah, "Enter the first number: ", "$"
 secondNumberMsg: db 0dh,0ah, "Enter the second number: ", "$"
 errorMsg: db 0dh,0ah, "Not valid number, press any key to restart $"   ; if we removed the dollar sign ($) it will print the next message. it makes the console stops instead of it
 resultMsg: db 0dh,0ah, "The result is: $"
 SubNegativeMessage: db      0dh,0ah,"Result : - $"
+reminderMsg: db 0dh,0ah, "The reminder is: $" ,0dh,0ah
 
 
 
@@ -127,7 +129,8 @@ View:  mov ax,dx
        
 
 exit:   
-        mov ah, 09h
+        mov ah, 09h     
+        mov dx,offset operationMsg
         int 21h  
         mov ah, 0
         int 16h
@@ -198,9 +201,43 @@ Multiplication: mov ah,09h
 
 
 
-Division:
-ret
-
-
-
-
+Division:   mov ah,9
+            mov dx,offset firstNumberMsg   
+            int 21h
+            mov cx,0
+            call InputNumber
+            push dx
+              
+            mov ah,9
+            mov dx,offset secondNumberMsg   
+            int 21h
+            mov cx,0
+            call InputNumber 
+            
+            mov bx,dx
+            mov dx,0
+            pop ax
+            div bx
+            push dx
+            mov dx,ax
+            push dx
+            mov ah,9
+            mov dx,offset resultMsg   
+            int 21h
+            pop dx
+            mov cx,10000
+            call View 
+            pop dx
+            mov cx,10000
+            mov bx,dx
+            
+            mov ah,9
+            mov dx,offset reminderMsg
+            int 21h
+            
+            mov dx,bx
+            call View 
+            jmp exit 
+    ret
+    
+    
