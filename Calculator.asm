@@ -14,7 +14,7 @@ firstNumberMsg: db 0dh,0ah, "Enter the first number: ", "$"
 secondNumberMsg: db 0dh,0ah, "Enter the second number: ", "$"
 errorMsg: db 0dh,0ah, "Not valid number, press any key to restart $"   ; if we removed the dollar sign ($) it will print the next message. it makes the console stops instead of it
 resultMsg: db 0dh,0ah, "The result is: $"
-SubNegativeMessage: db      0dh,0ah,"Result : - $"
+SubNegativeMessage: db      0dh,0ah,"Result : -$"
 reminderMsg: db 0dh,0ah, "The reminder is: $" ,0dh,0ah
 
 
