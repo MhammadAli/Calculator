@@ -7,8 +7,6 @@ org 100h
 jmp start                                              ;0ah is equal to \n for new line   = 10 in decimal
                                                        ;0dh is carriage return            = 13 in decimal
                               
-
-
 operationMsg: db 0dh,0ah, "Choose your operation" ,0dh,0ah,"1- Addition" ,0dh,0ah,"2- Subtraction" ,0dh,0ah,"3- Multiplication" ,0dh,0ah,"4- Division" ,0dh,0ah,"$"
 firstNumberMsg: db 0dh,0ah, "Enter the first number: ", "$"
 secondNumberMsg: db 0dh,0ah, "Enter the second number: ", "$"
@@ -16,8 +14,6 @@ errorMsg: db 0dh,0ah, "Not valid number, press any key to restart $"   ; if we r
 resultMsg: db 0dh,0ah, "The result is: $"
 SubNegativeMessage: db      0dh,0ah,"Result : -$"
 reminderMsg: db 0dh,0ah, "The reminder is: $" ,0dh,0ah
-
-
 
 
 
@@ -98,7 +94,7 @@ GatheringDigits:pop ax          ;Load the last input digit to register ax (Least
                 jne GatheringDigits
                 ret
 
-
+;function to view the whole number
 ViewNumber:     push ax         ;push the entered number to the stack
                 push dx         
                 mov dx,ax       ;the output number is stored in dx 
@@ -110,8 +106,7 @@ ViewNumber:     push ax         ;push the entered number to the stack
                 ret  
                 
                                            
-                
-                
+;function to view one digit                                                          
 View:  mov ax,dx
        mov dx,0
        div cx 
