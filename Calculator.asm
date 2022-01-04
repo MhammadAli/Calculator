@@ -85,7 +85,44 @@ onelesstwo:  sub dx,bx
             call View                       
             jmp exit
                    
+negativetwo:cmp di,1
+            je res
+            mov ax,dx
+            cmp bx,dx
+            jl  li
+            sub bx,dx                        ;Addition performed and stored in dx register
+            mov dx,bx
+            push dx                          ;push the addition result to the stack
+            mov ah,9
+            mov dx,offset resultMsg          ;Display the addition result
+            int 21h
+            mov cx,10000                     ;Setting the max number of digits that an input can be contained 
+            pop dx                           
+            call View                       
+            jmp exit
+            
 
+li:         sub ax,bx
+            mov dx,ax
+            push dx
+            mov ah,9
+            mov dx, offset SubNegativeMessage
+            int 21h
+            mov cx,10000
+            pop dx
+            call View 
+            jmp exit
+            
+            
+res:        add dx,bx                        ;Addition performed and stored in dx register
+            push dx                          ;push the addition result to the stack
+            mov ah,9
+            mov dx,offset SubNegativeMessage
+            int 21h
+            mov cx,10000                     ;Setting the max number of digits that an input can be contained 
+            pop dx                           
+            call View                       
+            jmp exit
 
 InputNumber:    mov ah,0             ;Store input in al so clear ah
                 int 16h              ;Inturrept cpu to get input from keyboard
