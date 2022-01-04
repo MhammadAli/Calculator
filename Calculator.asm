@@ -43,15 +43,39 @@ Addition:   mov ah,09h ;
             mov dx, offset firstNumberMsg    ;Prompt asking user to enter the first number  
             int 21h                          ;Inturrept cpu to get input from keyboard   
             mov cx,0                         ;Holds the number of digits of the input number 
-            call InputNumber                 ;Handling input number as each number will be taken seprately
+            call InputNumber                 ;Handling input number as each number will be taken seprately 
+            mov di,si                        ;di sign of first si secound  
+            mov si,0
             push dx 
             mov ah,9
             mov dx, offset secondNumberMsg   ;Prompt asking user to enter the second number 
             int 21h
             mov cx,0                         ;reset the digit counter to be prepared to deal with the second number
             call InputNumber
-            pop bx                           ;Recieve the value of the first number
-            add dx,bx                        ;Addition performed and stored in dx register
+            pop bx                             ;Recieve the value of the first number 
+            cmp si,1
+            je  negativetwo
+            cmp di,1
+            je negativeone
+            jmp normal
+             
+
+
+negativeone:cmp bx,dx
+            jl onelistwo
+            sub bx,dx
+            mov dx,bx
+            push dx                          ;push the addition result to the stack
+            mov ah,9
+            mov dx,offset SubNegativeMessage          ;Display the addition result
+            int 21h
+            mov cx,10000                     ;Setting the max number of digits that an input can be contained 
+            pop dx                           
+            call View                       
+            jmp exit
+
+
+onelesstwo:  sub dx,bx
             push dx                          ;push the addition result to the stack
             mov ah,9
             mov dx,offset resultMsg          ;Display the addition result
@@ -59,7 +83,7 @@ Addition:   mov ah,09h ;
             mov cx,10000                     ;Setting the max number of digits that an input can be contained 
             pop dx                           
             call View                       
-            jmp exit    
+            jmp exit
                    
 
 
