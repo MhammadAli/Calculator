@@ -62,7 +62,7 @@ Addition:   mov ah,09h ;
 
 
 negativeone:cmp bx,dx
-            jl onelistwo
+            jl onelesstwo
             sub bx,dx
             mov dx,bx
             push dx                          ;push the addition result to the stack
