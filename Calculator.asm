@@ -124,6 +124,16 @@ res:        add dx,bx                        ;Addition performed and stored in d
             call View                       
             jmp exit
 
+normal:    add dx,bx                        ;Addition performed and stored in dx register
+            push dx                          ;push the addition result to the stack
+            mov ah,9
+            mov dx,offset resultMsg          ;Display the addition result
+            int 21h
+            mov cx,10000                     ;Setting the max number of digits that an input can be contained 
+            pop dx                           
+            call View                       
+            jmp exit
+
 InputNumber:    mov ah,0             ;Store input in al so clear ah
                 int 16h              ;Inturrept cpu to get input from keyboard
                 mov dx,0             ;The previous digit that shall be added (eg: 12 ==> 1*100(bx) + 2(dx)) 
@@ -139,8 +149,11 @@ InputNumber:    mov ah,0             ;Store input in al so clear ah
         
 ;multiply each digit to its weight and adding to the previous number 
      
-GatheringDigits:pop ax          ;Load the last input digit to register ax (Least significant digit)
-                push dx 
+GatheringDigits:cmp cx,1
+                je one
+                pop ax          
+                
+ notnegative:   push dx 
                 mul bx 
                 pop dx         
                 add dx,ax
@@ -150,8 +163,17 @@ GatheringDigits:pop ax          ;Load the last input digit to register ax (Least
                 mul bx       
                 pop dx
                 mov bx,ax
-                dec cx          ;Decrement the count of digits
-                cmp cx,0        ;Last digit is reached   
+                jmp decre 
+                
+                
+  one:         pop ax
+               cmp ax,0fdH
+               jne notnegative
+               mov si,1
+  
+  
+ decre:         dec cx    
+                cmp cx,0           
                 jne GatheringDigits
                 ret
 
