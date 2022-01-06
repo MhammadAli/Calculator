@@ -316,8 +316,17 @@ cubeNum:
                 mov dx,ax
                 push dx 
                 mov ah,9
-                mov dx, offset resultSqrcb
-                int 21h
+                cmp si,1
+                je cubneg
+                mov dx,offset resultSqrcb
+                jmp cubpos
+                
+cubneg:         mov dx, offset SubNegativeMessage
+                
+                
+                
+                
+ cubpos:        int 21h
                 mov cx,10000
                 pop dx
                 call View 
