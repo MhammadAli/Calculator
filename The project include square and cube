@@ -1,4 +1,4 @@
-
+                        
 ; You may customize this and other start-up templates; 
 ; The location of this template is c:\emu8086\inc\0_com_template.txt
 
@@ -20,11 +20,11 @@ SubNegativeMessage: db      0dh,0ah,"Result : -$"
 reminderMsg: db 0dh,0ah, "The reminder is: $" ,0dh,0ah
 
 
-;This part is for the square Number  
+;This part is for the square and cube of a Number  
 
-SquareNumMsg: db 0dh,0ah, "Enter the number: ", "$"  
+SqrcbNumMsg: db 0dh,0ah, "Enter the number: ", "$"  
 
-resultSquare: db 0dh,0ah, "The result is: $"
+resultSqrcb: db 0dh,0ah, "The result is: $"
 
 
 
@@ -298,7 +298,7 @@ Multiplication: mov ah,09h
 
 sqrNum:         
                 mov ah,09h
-                mov dx, offset SquareNumMsg
+                mov dx, offset SqrcbNumMsg
                 int 21h 
                 mov cx,0
                 call InputNumber
@@ -310,7 +310,7 @@ sqrNum:
                 mov dx,ax
                 push dx 
                 mov ah,9
-                mov dx, offset resultSquare
+                mov dx, offset resultSqrcb
                 int 21h
                 mov cx,10000
                 pop dx
@@ -319,7 +319,7 @@ sqrNum:
 
 cubeNum:         
                 mov ah,09h
-                mov dx, offset SquareNumMsg
+                mov dx, offset SqrcbNumMsg
                 int 21h 
                 mov cx,0
                 call InputNumber
@@ -333,7 +333,7 @@ cubeNum:
                 mov dx,ax
                 push dx 
                 mov ah,9
-                mov dx, offset resultSquare
+                mov dx, offset resultSqrcb
                 int 21h
                 mov cx,10000
                 pop dx
