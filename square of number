@@ -1,0 +1,21 @@
+sqrNum:         
+                mov ah,09h
+                mov dx, offset SquareNumMsg
+      
+                int 21h 
+                mov cx,0
+                call InputNumber
+                push dx     
+                pop bx
+                mov ax,dx
+                mov bl , al
+                mul bx 
+                mov dx,ax
+                push dx 
+                mov ah,9
+                mov dx, offset resultSquare
+                int 21h
+                mov cx,10000
+                pop dx
+                call View 
+                jmp exit  
