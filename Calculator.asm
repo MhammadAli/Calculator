@@ -19,7 +19,7 @@ errorMsg: db 0dh,0ah, "Not valid number, press any key to restart $"   ; if we r
 resultMsg: db 0dh,0ah, "The result is: $"
 SubNegativeMessage: db      0dh,0ah,"Result : -$"
 reminderMsg: db 0dh,0ah, "The reminder is: $" ,0dh,0ah
-
+negativeReminderMsg:  db 0dh,0ah, "The reminder is: -$" ,0dh,0ah
 
 ;This part is for the square and cube of a Number  
 
