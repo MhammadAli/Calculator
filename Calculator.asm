@@ -377,8 +377,8 @@ Division:   mov ah,9
             push dx
             mov ah,9
             
-            xor di,si
-            cmp di,1
+            xor si,di
+            cmp si,1
             je divvneg                       ;if negative we will print negative sign message
             mov dx,offset resultMsg
             jmp divpos
@@ -393,15 +393,17 @@ Division:   mov ah,9
             pop dx
             mov cx,10000
             mov bx,dx
-            
-            mov ah,9
-            mov dx,offset reminderMsg
-            int 21h
-            
+            mov ah,9 
+            cmp di,1
+            je remneg
+   rempos:  mov dx,offset reminderMsg      
+            jmp continue
+   remneg:  mov dx,offset negativeReminderMsg  ;if first number is negative, print negative reminder
+ 
+ continue:  int 21h        
             mov dx,bx
             call View 
-            jmp exit 
-    ret
+            jmp exit
     
              
 root:       inc bx
