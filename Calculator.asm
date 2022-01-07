@@ -30,7 +30,9 @@ resultSqrcb: db 0dh,0ah, "The result is: $"
 
 
 
-start: mov ah,9
+start: mov si,0
+       mov di,0
+       mov ah,9
        mov dx,offset operationMsg
        int 21h                                           ; call the interrupt handler 0x21 which is the DOS Function dispatcher. ; we must enter 9 in ah as a function code then it will check the content in dx then display it
        ;mov ah,0                                          ; we must enter the code of function then we can use the int 16h 
@@ -248,34 +250,17 @@ Subtraction:mov ah,09h
             int 21h
             mov cx,0
             call InputNumber
+            mov di,si                        ;di sign of first si secound  
+            mov si,0
             push dx
             mov ah,9
             mov dx, offset secondNumberMsg
             int 21h 
             mov cx,0
             call InputNumber
-            pop bx
-            mov ax,dx
-            cmp bx,ax
-            jl  Liss
-            sub bx,ax
-            mov dx,bx
-            push dx
-            mov ah,9
-            mov dx, offset resultMsg
-            jmp complet
-              
-Liss:       sub ax,bx
-            mov dx,ax
-            push dx
-            mov ah,9
-            mov dx, offset SubNegativeMessage
-
-complet:    int 21h
-            mov cx,10000
-            pop dx
-            call View 
-            jmp exit   
+            pop bx 
+            xor si,1
+            jmp subb   
 
 
 
