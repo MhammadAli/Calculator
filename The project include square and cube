@@ -9,7 +9,7 @@ jmp start                                              ;0ah is equal to \n for n
 
                                                        
 num dw ?                                                ; this variable is for hold the result of the square to multibly to ax to get the cube of number         
-operationMsg: db 0dh,0ah, "Choose your operation" ,0dh,0ah,"1- Addition" ,0dh,0ah,"2- Subtraction" ,0dh,0ah,"3- Multiplication" ,0dh,0ah,"4- Division" ,0dh,0ah,"5- Square of Number" ,0dh,0ah, "6- Cube of Number" ,0dh,0ah,  "$"
+operationMsg: db 0dh,0ah, "Choose your operation" ,0dh,0ah,"1- Addition" ,0dh,0ah,"2- Subtraction" ,0dh,0ah,"3- Multiplication" ,0dh,0ah,"4- Division" ,0dh,0ah,"5- Square of Number" ,0dh,0ah, "6- Cube of Number" ,0dh,0ah,"7- Square Root",0dh,0ah, "$"
 firstNumberMsg: db 0dh,0ah, "Enter the first number: ", "$" 
 
 
@@ -45,7 +45,9 @@ start: mov ah,9
        cmp al,35h
        je sqrNum
        cmp al,36h
-       je cubeNum 
+       je cubeNum
+       cmp al,37h
+       je SquareRoot
        mov ah,9      
        mov dx,offset errorMsg
        int 21h   
@@ -377,7 +379,37 @@ Division:   mov ah,9
             
             mov dx,bx
             call View 
-            jmp exit 
+            jmp exit
+            
+             
+root:       inc bx
+            jmp  here    
+                     
+            
+SquareRoot: mov ah,9
+            mov dx,offset firstNumberMsg
+            int 21h
+            mov cx,0                         ;Holds the number of digits of the input number 
+            call InputNumber
+            mov bx,1
+            mov cx,dx
+  here:     mov ax,bx 
+            mul bx 
+            mov dx,ax
+            cmp dx,cx
+            jne root
+            
+              
+            mov ah,9
+            mov dx,offset resultMsg  
+            int 21h 
+            mov dx,bx 
+            mov cx,10000
+            call view
+            call exit 
+            
+ 
+
     ret
     
     
