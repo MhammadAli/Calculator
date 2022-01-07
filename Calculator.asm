@@ -17,16 +17,20 @@ secondNumberMsg: db 0dh,0ah, "Enter the second number: ", "$"
 rootNumberMsg: db 0dh,0ah, "Enter the number: ", "$"
 errorMsg: db 0dh,0ah, "Not valid number, press any key to restart $"   ; if we removed the dollar sign ($) it will print the next message. it makes the console stops instead of it
 resultMsg: db 0dh,0ah, "The result is: $"
-SubNegativeMessage: db      0dh,0ah,"Result : -$"
+SubNegativeMessage: db      0dh,0ah,"The Result is : -$"
+AppSubNegativeMessage: db      0dh,0ah,"The Approximated result is: -$"
 reminderMsg: db 0dh,0ah, "The reminder is: $" ,0dh,0ah
-negativeReminderMsg:  db 0dh,0ah, "The reminder is: -$" ,0dh,0ah
+ApproxMsg: db 0dh,0ah, "The Approximated result is: $" ,0dh,0ah
+jApproMsg: db 0dh,0ah, "The Approximated result is: J $" ,0dh,0ah
+jMsg: db 0dh,0ah, "The result is: J $" ,0dh,0ah 
 
+Error2: db 0dh,0ah, "Logic Error $" ,0dh,0ah
 ;This part is for the square and cube of a Number  
 
 SqrcbNumMsg: db 0dh,0ah, "Enter the number: ", "$"  
 
 resultSqrcb: db 0dh,0ah, "The result is: $"
-
+negativeReminderMsg: db 0dh,0ah, "The reminder is: -$" ,0dh,0ah
 
 
 
@@ -34,13 +38,11 @@ start: mov si,0
        mov di,0
        mov ah,9
        mov dx,offset operationMsg
-       int 21h                                           ; call the interrupt handler 0x21 which is the DOS Function dispatcher. ; we must enter 9 in ah as a function code then it will check the content in dx then display it
-       ;mov ah,0                                          ; we must enter the code of function then we can use the int 16h 
-       ;int 16h 
+       int 21h              
        mov cx,0
        call inputNumber
        mov al,dl
-       add al,30h                                        ; like cin or scanf. it will check the function code in ah then it will return the ascii character of the pressed button
+       add al,30h                                        
        cmp al,31h                                        ; 1 in ascii  (Addition) 
        je Addition
        cmp al, 32h
@@ -89,7 +91,7 @@ subb:       cmp si,1
              
 
 
-negativeone:cmp bx,dx
+negativeone:cmp bx,dx           ; the first number is negative  and the second is positive
             jl onelesstwo
             sub bx,dx
             mov dx,bx
@@ -113,9 +115,9 @@ onelesstwo:  sub dx,bx
             call View                       
             jmp exit
                    
-negativetwo:cmp di,1
-            je res
-            mov ax,dx
+negativetwo:cmp di,1            
+            je res       ; the first is negative and the second is negative
+            mov ax,dx    ; the first is positive and the second is negative
             cmp bx,dx
             jl  li
             sub bx,dx                        ;Addition performed and stored in dx register
@@ -129,7 +131,7 @@ negativetwo:cmp di,1
             call View                       
             jmp exit
             
-
+; the first number is less than the second number
 li:         sub ax,bx
             mov dx,ax
             push dx
@@ -141,7 +143,7 @@ li:         sub ax,bx
             call View 
             jmp exit
             
-            
+ ; the first number is negative and the second is negative            
 res:        add dx,bx                        ;Addition performed and stored in dx register
             push dx                          ;push the addition result to the stack
             mov ah,9
@@ -160,13 +162,15 @@ normal:    add dx,bx                        ;Addition performed and stored in dx
             mov cx,10000                     ;Setting the max number of digits that an input can be contained 
             pop dx                           
             call View                       
-            jmp exit
+            jmp exit                    
 
 InputNumber:    mov ah,0             ;Store input in al so clear ah
                 int 16h              ;Inturrept cpu to get input from keyboard
                 mov dx,0             ;The previous digit that shall be added (eg: 12 ==> 1*100(bx) + 2(dx)) 
-                mov bx,1             ;the weight of the digit (initially 1)         
-                cmp al,0dh           ;Compare al to 0dh which represents 'Enter' key to assert that numebr is entered
+                mov bx,1             ;the weight of the digit (initially 1)
+                cmp al,08h           ; asci code of back space
+                je backSpace                      
+continue:       cmp al,0dh           ;Compare al to 0dh which represents 'Enter' key to assert that numebr is entered
                 je GatheringDigits   ;Concatenate the digits of the input number
                 sub ax,30h           ;Convert the value stored in al from Ascii to decimal
                 call ViewNumber      ;Displays the input number
@@ -175,27 +179,41 @@ InputNumber:    mov ah,0             ;Store input in al so clear ah
                 inc cx              ;Increment the number of digits of the input number  
                 jmp InputNumber     ;Taking a new number from the user 
         
-;multiply each digit to its weight and adding to the previous number 
-     
+                                                   
+                                        
+                                                             
+backSpace:      mov ah,02h                              
+                mov dl,08h             ; Another backspace character to move cursor back again
+                int 21h 
+                mov dl,20h             ; A space to clear old character
+                int 21h   
+                mov dl,08h             ; Another backspace character to move cursor back again
+                int 21h  
+                dec cx                 ; to decrease the number of digits
+                pop ax                 ; to delete the old number from stack 
+                jmp inputNumber 
+ 
+ 
+;multiply each digit to its weight and adding to the previous number     
 GatheringDigits:cmp cx,1
                 je one
                 pop ax          
                 
  notnegative:   push dx 
                 mul bx 
-                pop dx         
+                pop dx                      
                 add dx,ax
-                mov ax,bx
+                mov ax,bx                      
                 mov bx,10   
-                push dx
-                mul bx       
-                pop dx
+                push dx                                                         
+                mul bx                                                          
+                pop dx                                                         
                 mov bx,ax
                 jmp decre 
                 
-                
-  one:         pop ax
-               cmp ax,0fdH
+; check the last digit if it - or a number
+ one:          pop ax
+               cmp ax,0fdH      ; ascii for -
                jne notnegative
                mov si,1
   
@@ -217,7 +235,7 @@ ViewNumber:     push ax         ;push the entered number to the stack
                 ret  
                 
                                            
-;function to view one digit                                                          
+;function to view one digit       4                                                   
 View:  mov ax,dx
        mov dx,0
        div cx 
@@ -235,9 +253,9 @@ View:  mov ax,dx
        
 
 exit:   
-        mov ah, 09h     
-        mov dx,offset operationMsg
-        int 21h  
+       ; mov ah, 09h     
+        ;mov dx,offset operationMsg
+        ;int 21h  
         mov ah, 0
         int 16h
         call start  ;return to menu to select a new operation
@@ -260,7 +278,7 @@ Subtraction:mov ah,09h
             call InputNumber
             pop bx 
             xor si,1
-            jmp subb   
+            jmp subb  
 
 
 
@@ -340,15 +358,29 @@ cubeNum:
                 mov dx,ax
                 push dx 
                 mov ah,9
-                mov dx, offset resultSqrcb
-                int 21h
+                cmp si,1
+                je cubneg
+                mov dx,offset resultSqrcb
+                jmp cubpos
+                
+cubneg:         mov dx, offset SubNegativeMessage
+                
+                
+                
+                
+ cubpos:        int 21h
                 mov cx,10000
                 pop dx
                 call View 
                 jmp exit
                                       
+Error:    
+            mov ah,9
+            mov dx,offset Error2  
+            int 21h 
+            call exit
 
- 
+
 Division:   mov ah,9
             mov dx,offset firstNumberMsg   
             int 21h
@@ -368,8 +400,9 @@ Division:   mov ah,9
             mov dx,0
             pop ax                           ;ax is the first number , bx is the second number
             
-
-            div bx
+            cmp bx,0
+            je  Error
+            div bx      ; divide ax / bx
             push dx
             mov dx,ax
             push dx
@@ -387,41 +420,103 @@ Division:   mov ah,9
     divpos: int 21h
             pop dx
             mov cx,10000
-            call View 
-            pop dx
+            call View                       
+            pop dx               
             mov cx,10000
             mov bx,dx
             mov ah,9 
             cmp di,1
             je remneg
    rempos:  mov dx,offset reminderMsg      
-            jmp continue
+            jmp continue1
    remneg:  mov dx,offset negativeReminderMsg  ;if first number is negative, print negative reminder
  
- continue:  int 21h        
+ continue1:  int 21h        
             mov dx,bx
             call View 
             jmp exit
-    
+            
              
 root:       inc bx
-            jmp  here    
-                     
+            jmp  here                
+     
+big:        cmp si,1
+            je  jAppr
+            dec bx
+            mov ah,9
+            mov dx,offset ApproxMsg  
+            int 21h 
+            mov dx,bx 
+            mov cx,10000
+            call view
+            call exit
             
-SquareRoot: mov ah,9
+big2:       cmp si,1
+            je  minus
+            dec bx
+            mov ah,9
+            mov dx,offset ApproxMsg  
+            int 21h 
+            mov dx,bx 
+            mov cx,10000
+            call view
+            call exit
+
+
+minus:      dec bx
+            mov ah,9
+            mov dx,offset AppSubNegativeMessage  
+            int 21h 
+            mov dx,bx 
+            mov cx,10000
+            call view
+            call exit
+
+                         
+                
+jAppr:      dec bx
+            mov ah,9
+            mov dx,offset jApproMsg  
+            int 21h 
+            mov dx,bx 
+            mov cx,10000
+            call view
+            call exit
+            
+Jnormal:    mov ah,9
+            mov dx,offset jMsg  
+            int 21h 
+            mov dx,bx 
+            mov cx,10000
+            call view
+            call exit
+
+
+cubeminus:   mov ah,9
+            mov dx,offset SubNegativeMessage  
+            int 21h 
+            mov dx,bx 
+            mov cx,10000
+            call view
+            call exit                                
+            
+SquareRoot: mov ah,9 ;2 print char  9 print
             mov dx,offset rootNumberMsg
             int 21h
             mov cx,0                         ;Holds the number of digits of the input number 
             call InputNumber
+            
             mov bx,1
             mov cx,dx
   here:     mov ax,bx 
             mul bx 
             mov dx,ax
             cmp dx,cx
+            jg  big
             jne root
             
-              
+            cmp si,1
+            je  Jnormal 
             mov ah,9
             mov dx,offset resultMsg  
             int 21h 
@@ -446,8 +541,12 @@ CubicRoot: mov ah,9
            mul bx
            mov dx,ax
            cmp dx,cx
+           jg  big2
            jne cubic
             
+           
+           cmp si,1
+            je  cubeminus
            mov ah,9
             mov dx,offset resultMsg  
             int 21h 
