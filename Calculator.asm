@@ -41,6 +41,8 @@ start: mov si,0
        int 21h              
        mov cx,0
        call inputNumber
+       cmp si,1
+       je  e
        mov al,dl
        add al,30h                                        
        cmp al,31h                                        ; 1 in ascii  (Addition) 
@@ -59,7 +61,8 @@ start: mov si,0
        je SquareRoot
        cmp al,38h
        je CubicRoot  
-       mov ah,9      
+      
+e:     mov ah,9      
        mov dx,offset errorMsg
        int 21h   
        mov ah,0
