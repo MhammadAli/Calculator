@@ -81,7 +81,7 @@ Addition:   mov ah,09h ;
             mov cx,0                         ;reset the digit counter to be prepared to deal with the second number
             call InputNumber
             pop bx                             ;Recieve the value of the first number 
-            cmp si,1
+subb:       cmp si,1
             je  negativetwo
             cmp di,1
             je negativeone
