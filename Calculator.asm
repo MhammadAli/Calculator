@@ -9,7 +9,7 @@ jmp start                                              ;0ah is equal to \n for n
 
                                                        
 num dw ?                                                ; this variable is for hold the result of the square to multibly to ax to get the cube of number         
-operationMsg: db 0dh,0ah, "Choose your operation" ,0dh,0ah,"1- Addition" ,0dh,0ah,"2- Subtraction" ,0dh,0ah,"3- Multiplication" ,0dh,0ah,"4- Division" ,0dh,0ah,"5- Square of Number" ,0dh,0ah, "6- Cube of Number" ,0dh,0ah,  "$"
+operationMsg: db 0dh,0ah, "Choose your operation" ,0dh,0ah,"1- Addition" ,0dh,0ah,"2- Subtraction" ,0dh,0ah,"3- Multiplication" ,0dh,0ah,"4- Division" ,0dh,0ah,"5- Square of Number" ,0dh,0ah, "6- Cube of Number" ,0dh,0ah,"7- Square Root",0dh,0ah, "$"
 firstNumberMsg: db 0dh,0ah, "Enter the first number: ", "$" 
 
 
@@ -29,10 +29,7 @@ resultSqrcb: db 0dh,0ah, "The result is: $"
 
 
 
-start: 
-       mov si,0
-       mov di,0
-       mov ah,9
+start: mov ah,9
        mov dx,offset operationMsg
        int 21h                                           ; call the interrupt handler 0x21 which is the DOS Function dispatcher. ; we must enter 9 in ah as a function code then it will check the content in dx then display it
        mov ah,0                                          ; we must enter the code of function then we can use the int 16h 
@@ -48,7 +45,9 @@ start:
        cmp al,35h
        je sqrNum
        cmp al,36h
-       je cubeNum 
+       je cubeNum
+       cmp al,37h
+       je SquareRoot
        mov ah,9      
        mov dx,offset errorMsg
        int 21h   
@@ -73,7 +72,7 @@ Addition:   mov ah,09h ;
             mov cx,0                         ;reset the digit counter to be prepared to deal with the second number
             call InputNumber
             pop bx                             ;Recieve the value of the first number 
-subb:       cmp si,1
+            cmp si,1
             je  negativetwo
             cmp di,1
             je negativeone
@@ -242,17 +241,34 @@ Subtraction:mov ah,09h
             int 21h
             mov cx,0
             call InputNumber
-            mov di,si                        ;di sign of first si secound  
-            mov si,0
             push dx
             mov ah,9
             mov dx, offset secondNumberMsg
             int 21h 
             mov cx,0
             call InputNumber
-            pop bx 
-            xor si,1
-            jmp subb
+            pop bx
+            mov ax,dx
+            cmp bx,ax
+            jl  Liss
+            sub bx,ax
+            mov dx,bx
+            push dx
+            mov ah,9
+            mov dx, offset resultMsg
+            jmp complet
+              
+Liss:       sub ax,bx
+            mov dx,ax
+            push dx
+            mov ah,9
+            mov dx, offset SubNegativeMessage
+
+complet:    int 21h
+            mov cx,10000
+            pop dx
+            call View 
+            jmp exit   
 
 
 
@@ -319,17 +335,8 @@ cubeNum:
                 mov dx,ax
                 push dx 
                 mov ah,9
-                cmp si,1
-                je cubneg
-                mov dx,offset resultSqrcb
-                jmp cubpos
-                
-cubneg:         mov dx, offset SubNegativeMessage
-                
-                
-                
-                
- cubpos:        int 21h
+                mov dx, offset resultSqrcb
+                int 21h
                 mov cx,10000
                 pop dx
                 call View 
@@ -372,7 +379,37 @@ Division:   mov ah,9
             
             mov dx,bx
             call View 
-            jmp exit 
+            jmp exit
+            
+             
+root:       inc bx
+            jmp  here    
+                     
+            
+SquareRoot: mov ah,9
+            mov dx,offset firstNumberMsg
+            int 21h
+            mov cx,0                         ;Holds the number of digits of the input number 
+            call InputNumber
+            mov bx,1
+            mov cx,dx
+  here:     mov ax,bx 
+            mul bx 
+            mov dx,ax
+            cmp dx,cx
+            jne root
+            
+              
+            mov ah,9
+            mov dx,offset resultMsg  
+            int 21h 
+            mov dx,bx 
+            mov cx,10000
+            call view
+            call exit 
+            
+ 
+
     ret
     
     
