@@ -9,11 +9,12 @@ jmp start                                              ;0ah is equal to \n for n
 
                                                        
 num dw ?                                                ; this variable is for hold the result of the square to multibly to ax to get the cube of number         
-operationMsg: db 0dh,0ah, "Choose your operation" ,0dh,0ah,"1- Addition" ,0dh,0ah,"2- Subtraction" ,0dh,0ah,"3- Multiplication" ,0dh,0ah,"4- Division" ,0dh,0ah,"5- Square of Number" ,0dh,0ah, "6- Cube of Number" ,0dh,0ah,"7- Square Root",0dh,0ah, "$"
+operationMsg: db 0dh,0ah, "Choose your operation" ,0dh,0ah,"1- Addition" ,0dh,0ah,"2- Subtraction" ,0dh,0ah,"3- Multiplication" ,0dh,0ah,"4- Division" ,0dh,0ah,"5- Square of Number" ,0dh,0ah, "6- Cube of Number" ,0dh,0ah,"7- Square Root",0dh,0ah,"8- Cubic Root",0dh,0ah, "$"
 firstNumberMsg: db 0dh,0ah, "Enter the first number: ", "$" 
 
 
 secondNumberMsg: db 0dh,0ah, "Enter the second number: ", "$"
+rootNumberMsg: db 0dh,0ah, "Enter the number: ", "$"
 errorMsg: db 0dh,0ah, "Not valid number, press any key to restart $"   ; if we removed the dollar sign ($) it will print the next message. it makes the console stops instead of it
 resultMsg: db 0dh,0ah, "The result is: $"
 SubNegativeMessage: db      0dh,0ah,"Result : -$"
@@ -32,8 +33,12 @@ resultSqrcb: db 0dh,0ah, "The result is: $"
 start: mov ah,9
        mov dx,offset operationMsg
        int 21h                                           ; call the interrupt handler 0x21 which is the DOS Function dispatcher. ; we must enter 9 in ah as a function code then it will check the content in dx then display it
-       mov ah,0                                          ; we must enter the code of function then we can use the int 16h 
-       int 16h                                           ; like cin or scanf. it will check the function code in ah then it will return the ascii character of the pressed button
+       ;mov ah,0                                          ; we must enter the code of function then we can use the int 16h 
+       ;int 16h 
+       mov cx,0
+       call inputNumber
+       mov al,dl
+       add al,30h                                        ; like cin or scanf. it will check the function code in ah then it will return the ascii character of the pressed button
        cmp al,31h                                        ; 1 in ascii  (Addition) 
        je Addition
        cmp al, 32h
@@ -48,6 +53,8 @@ start: mov ah,9
        je cubeNum
        cmp al,37h
        je SquareRoot
+       cmp al,38h
+       je CubicRoot  
        mov ah,9      
        mov dx,offset errorMsg
        int 21h   
@@ -387,7 +394,7 @@ root:       inc bx
                      
             
 SquareRoot: mov ah,9
-            mov dx,offset firstNumberMsg
+            mov dx,offset rootNumberMsg
             int 21h
             mov cx,0                         ;Holds the number of digits of the input number 
             call InputNumber
@@ -408,7 +415,34 @@ SquareRoot: mov ah,9
             call view
             call exit 
             
- 
+  cubic: inc bx
+         jmp there          
+            
+            
+CubicRoot: mov ah,9
+           mov dx,offset rootNumberMsg
+           int 21h
+           mov cx,0
+           call InputNumber
+           mov bx,1
+           mov cx,dx
+ there:    mov ax,bx
+           mul bx
+           mul bx
+           mov dx,ax
+           cmp dx,cx
+           jne cubic
+            
+           mov ah,9
+            mov dx,offset resultMsg  
+            int 21h 
+            mov dx,bx 
+            mov cx,10000
+            call view
+            call exit  
+
+
+
 
     ret
     
