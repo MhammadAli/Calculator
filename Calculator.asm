@@ -350,11 +350,14 @@ cubeNum:
                 jmp exit
                                       
 
+ 
 Division:   mov ah,9
             mov dx,offset firstNumberMsg   
             int 21h
             mov cx,0
             call InputNumber
+            mov di,si                        ;di sign of first , si secound  
+            mov si,0
             push dx
               
             mov ah,9
@@ -363,16 +366,27 @@ Division:   mov ah,9
             mov cx,0
             call InputNumber 
             
-            mov bx,dx
+            mov bx,dx                        
             mov dx,0
-            pop ax
+            pop ax                           ;ax is the first number , bx is the second number
+            
+
             div bx
             push dx
             mov dx,ax
             push dx
             mov ah,9
-            mov dx,offset resultMsg   
-            int 21h
+            
+            xor di,si
+            cmp di,1
+            je divvneg                       ;if negative we will print negative sign message
+            mov dx,offset resultMsg
+            jmp divpos
+
+
+   divvneg: mov dx,offset SubNegativeMessage
+            
+    divpos: int 21h
             pop dx
             mov cx,10000
             call View 
@@ -386,8 +400,9 @@ Division:   mov ah,9
             
             mov dx,bx
             call View 
-            jmp exit
-            
+            jmp exit 
+    ret
+    
              
 root:       inc bx
             jmp  here    
